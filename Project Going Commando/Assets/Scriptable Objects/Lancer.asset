@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3005799426357742a1f5b54e4f68997, type: 3}
+  m_Name: Lancer
+  m_EditorClassIdentifier: 
+  weaponName: Lancer
+  weaponPrefab: {fileID: 1770555473763712812, guid: 978f91db9bd86564a85e619b4085c246, type: 3}
+  bulletPrefab: {fileID: 8950876148833154496, guid: e57a34da6dcfca54c950c6360aeedaee, type: 3}
+  range: 12
+  cooldown: 0.15
+  isSemiAuto: 0
+  isCharge: 0
+  maxChargeTime: 0
+  chargeSpeed: 0
