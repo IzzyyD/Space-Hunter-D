@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using Unity.VisualScripting;
-using UnityEngine.Windows;
+
 
 public class NewPlayerMovement : MonoBehaviour
 {
@@ -193,6 +193,93 @@ public class NewPlayerMovement : MonoBehaviour
             rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Max(rb.linearVelocityY, -Data.maxFastFallSpeed));
         }
 
+        else if (isJumpCut)
+        {
+            // higher gravity if jump button released
+            SetGravityScale(Data.gravityScale * Data.jumpCutGravityMultiplier);
+            rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Max(rb.linearVelocityY, -Data.maxFallSpeed));
+        }
+
+        else if ((isJumping || isWallJumping || isJumpFalling) && Mathf.Abs(rb.linearVelocityY) < Data.jumpHangTimeThreshold)
+        { SetGravityScale(Data.gravityScale * Data.jumpHangGravityMultiplier); }
+
+        else if (rb.linearVelocityY < 0)
+        {
+            // higher gravity if falling
+            SetGravityScale(Data.gravityScale * Data.fallGravityMultiplier);
+            // caps maximum fall speed, so when falling over large distances we don't accelerate to insanely high speeds
+            rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Max(rb.linearVelocityY, -Data.maxFallSpeed));
+        }
+
+        else
+        {
+            // default gravity if standing on a platform or moving upwards
+            SetGravityScale(Data.gravityScale);
+        }
+        #endregion
+
+    }
+
+    private void FixedUpdate()
+    {
+        // handle run
+        if (isWallJumping)
+            Run(Data.wallJumpRunLerp);
+        else
+            Run(1);
+
+        // handle slide
+        if (isSliding)
+            Slide();
+    }
+
+    #region Input Callbacks
+    // methods which handle inputs detected in Update
+    public void OnJumpInput()
+    { lastPressedJumpTime = Data.jumpInputBufferTime; }
+
+    public void OnJumpUpInput()
+    {
+        if (CanJumpCut() || CanWallJumpCut())
+            isJumpCut = true;
+    }
+    #endregion
+
+    #region General Methods
+    public void SetGravityScale(float scale)
+    { rb.gravityScale = scale; }
+    #endregion
+
+    // movement methods
+    #region Run Methods
+    private void Run(float lerpAmount)
+    {
+        // calculate the direction we want to move in and our desired velocity
+        float targetSpeed = moveInput.x * Data.runMaxSpeed;
+        // we can reduce our control using Lerp() this smooths changes to are direction and speed
+        targetSpeed = Mathf.Lerp(rb.linearVelocityX, targetSpeed, lerpAmount);
+
+        #region Calculate AccelRate
+        float accelRate;
+
+        /// <summary>
+        /// gets an acceleration value based on if we're accelerating (includes turning)
+        /// or trying to decelerate
+        /// </summary>
+        if (lastOnGroundTime > 0)
+            accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? Data.runAccelAmount : Data.runDeccelAmount;
+        else
+            accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? Data.runAccelAmount * Data.accelInAir : Data.runDeccelAmount * Data.deccelInAir;
+        #endregion
+
+        #region Add Bonus Jump Apex Acceleration
+        // increase are acceleration and maxSpeed when at the apex of their jump, makes the jump feel a bit more bouncy, responsive and natural
+        if ((isJumping || isWallJumping || isJumpFalling) && Mathf.Abs(rb.linearVelocityY) < Data.jumpHangTimeThreshold)
+        {
+            accelRate *= Data.jumpHangAccelerationMultiplier;
+            targetSpeed *= Data.jumpHangMaxSpeedMultiplier;
+        }
+        #endregion
 
 
 

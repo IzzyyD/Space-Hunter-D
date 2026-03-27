@@ -75,7 +75,7 @@ public class PlayerData : ScriptableObject
     public float jumpHangTimeThreshold;    
     [Space(0.5f)]
     public float jumpHangAccelerationMultiplier;
-    public float jumpHangMaxSpeedMult;
+    public float jumpHangMaxSpeedMultiplier;
     
     
     
