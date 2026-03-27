@@ -109,6 +109,93 @@ public class NewPlayerMovement : MonoBehaviour
 
 
         #region Collision Checks
+        if (!isJumping)
+        {
+            // ground check
+            if (Physics2D.OverlapBox(groundCheckPoint.position, wallCheckSize, 0, groundLayer) && !isJumping) // checks if set box overlaps with ground
+            { lastOnGroundTime = Data.coyoteTime; } // if so, sets the lastGrounded to coyoteTime
+
+            // right wall check
+            if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, groundLayer) && !isFacingRight)
+            || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, groundLayer) && !isFacingRight)) && !isWallJumping)
+                lastOnWallRightTime = Data.coyoteTime;
+
+            // left wall check
+            if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, groundLayer) && !isFacingRight)
+            || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, groundLayer) && isFacingRight)) && !isWallJumping)
+                lastOnWallLeftTime = Data.coyoteTime;
+
+            // two checks needed for both left and right walls since whenever the player turns the wall checkPoints swap sides
+            lastOnWallTime = Mathf.Max(lastOnWallLeftTime, lastOnWallRightTime);
+        }
+        #endregion
+
+        #region Jump Checks
+        if (isJumping && rb.linearVelocityY < 0)
+        {
+            isJumping = false;
+
+            if(!isWallJumping)
+                isJumpFalling = true;
+        }
+
+        if (isWallJumping && Time.time - wallJumpStartTime > Data.wallJumpTime)
+        { isWallJumping = false; }
+
+        if (lastOnGroundTime > 0 && !isJumping && !isWallJumping)
+        {
+            isJumpCut = false;
+
+            if (!isJumping)
+                isJumpFalling = false;            
+        }
+
+        // jump
+        if (CanJump() && lastPressedJumpTime > 0)
+        {
+            isJumping = true;
+            isWallJumping = false;
+            isJumpCut = false;
+            isJumpFalling = false;
+            Jump();
+        }
+        // wall jump
+        else if (CanWallJump() && lastPressedJumpTime > 0)
+        {
+            isWallJumping = true;
+            isJumping = false;
+            isJumpCut = false;
+            isJumpFalling = false;
+            wallJumpStartTime = Time.time;
+            lastWallJumpDir = (lastOnWallRightTime > 0) ? -1 : 1;
+
+            WallJump(lastWallJumpDir);
+        }
+        #endregion
+
+        #region Slide Checks
+        if (CanSlide() && ((lastOnWallLeftTime > 0 && moveInput.x < 0) || (lastOnWallRightTime > 0 && moveInput.x > 0)))
+            isSliding = true;
+        else
+            isSliding = false;
+        #endregion
+
+        #region Gravity
+        // higher gravity if we've released the jump input or are falling
+        if (isSliding)
+        { SetGravityScale(0); }
+        
+        else if (rb.linearVelocityY < 0 && moveInput.y < 0)
+        {
+            // much higher gravity if holding down
+            SetGravityScale(Data.gravityScale * Data.fastFallGravityMultiplier);
+            // caps maximum fall speed, so when falling over large distances we don't accelerate to insanely high speeds
+            rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Max(rb.linearVelocityY, -Data.maxFastFallSpeed));
+        }
+
+
+
+
 
     }
 }
