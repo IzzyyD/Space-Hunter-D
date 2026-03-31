@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6936457513480837852}
   - component: {fileID: 2209390991469099627}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Blitz Cannon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -75,7 +75,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_Sprite: {fileID: 7482667652216324306, guid: f31ab909372facd4c887133ef63391b3, type: 3}
   m_Color: {r: 0, g: 0.0323627, b: 1, a: 1}
   m_FlipX: 0

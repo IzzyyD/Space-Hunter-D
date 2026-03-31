@@ -114,7 +114,7 @@ public class NewPlayerMovement : MonoBehaviour
             { lastOnGroundTime = Data.coyoteTime; } // if so, sets the lastGrounded to coyoteTime
 
             // right wall check
-            if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, groundLayer) && !isFacingRight)
+            if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, groundLayer) && isFacingRight)
             || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, groundLayer) && !isFacingRight)) && !isWallJumping)
                 lastOnWallRightTime = Data.coyoteTime;
 
@@ -363,7 +363,7 @@ public class NewPlayerMovement : MonoBehaviour
     private void Turn()
     {
         // stores scale and flips the player along the x-axis
-        Vector3 scale = transform.localScale;
+        Vector2 scale = transform.localScale;
         scale.x *= -1;
         transform.localScale = scale;
 
@@ -395,6 +395,10 @@ public class NewPlayerMovement : MonoBehaviour
         lastOnGroundTime = 0;
         lastOnWallLeftTime = 0;
         lastOnWallRightTime = 0;
+
+        // ensures we flip the player when they wall jump
+        if (Data.doTurnOnWallJump)
+        { CheckDirectionToFace(dir > 0); }
 
         #region Perform Wall Jump
         Vector2 force = new Vector2(Data.wallJumpForce.x, Data.wallJumpForce.y);
@@ -461,6 +465,71 @@ public class NewPlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(Data.dashRefillTime);
         dashRefilling = false;
         dashesLeft = Mathf.Min(Data.dashAmount, dashesLeft + 1);
+    }
+    #endregion
+
+    #region Other Movement Methods
+    private void Slide()
+    {        
+        // works the same as the Run but only in the y-axis
+        float speedDif = Data.slideSpeed - rb.linearVelocityY;
+        float movement = speedDif * Data.slideAccel;
+
+        // we clamp the movement here to prevent any over-corrections.
+        // the force applied can't be greater than the (negative) speedDifference * by how many times a second FixedUpdate() is called
+        movement = Mathf.Clamp(movement, -Mathf.Abs(speedDif) * (1 / Time.fixedDeltaTime), Mathf.Abs(speedDif) * (1 / Time.fixedDeltaTime));
+
+        rb.AddForce(movement * Vector2.up);
+    }
+    #endregion
+
+    #region Check Methods
+    public void CheckDirectionToFace(bool isMovingRight)
+    {
+        if (isMovingRight != isFacingRight)
+            Turn();
+    }
+
+    private bool CanJump()
+    { return lastOnGroundTime > 0 && !isJumping; }
+
+    private bool CanWallJump()
+    {
+        return lastPressedJumpTime > 0 && lastOnWallTime > 0 && lastOnGroundTime <= 0 && (!isWallJumping || 
+            (lastOnWallRightTime > 0 && lastWallJumpDir == 1) || (lastOnWallLeftTime > 0 && lastWallJumpDir == -1));
+    }
+
+    private bool CanJumpCut()
+    { return isJumping && rb.linearVelocityY > 0; }
+
+    private bool CanWallJumpCut()
+    { return isWallJumping && rb.linearVelocityY > 0; }
+
+    private bool CanDash()
+    {
+        if (!isDashing && dashesLeft < Data.dashAmount && lastOnGroundTime > 0 && !dashRefilling)
+        { StartCoroutine(nameof(RefillDash), 1);  }
+
+        return dashesLeft > 0;
+    }
+
+    public bool CanSlide()
+    {
+        if (lastOnWallTime > 0 && !isJumping && !isWallJumping && !isDashing && lastOnGroundTime <= 0)
+            return true;
+        else
+            return false;
+    }
+    #endregion
+
+    #region Editor Methods
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(groundCheckPoint.position, groundCheckSize);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(frontWallCheckPoint.position, wallCheckSize);
+        Gizmos.DrawWireCube(backWallCheckPoint.position, wallCheckSize);
     }
     #endregion
 }
