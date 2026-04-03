@@ -27,6 +27,10 @@ public class WeaponController : MonoBehaviour
     private float angle;
     private float chargeTime = 0f;
     private bool isCharging;
+    private NewPlayerMovement playerMovement;
+
+    private void Awake()
+    { playerMovement = GetComponentInParent<NewPlayerMovement>(); }
 
     void Start()
     {
@@ -159,13 +163,24 @@ public class WeaponController : MonoBehaviour
     
     void Aiming()
     {
-        worldPosition = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-        direction = (worldPosition - (Vector2)gunParent.position).normalized;
+        if ( gunParent == null || playerMovement == null) return;
+
+        float x = Input.GetAxisRaw("Horizontal");
+        float y = Input.GetAxisRaw("Vertical");
+
+        Vector2 aim = Vector2.zero;
+
+        if (x != 0 || y != 0)
+        {
+            aim.x = Mathf.Sign(x);
+            aim.y = Mathf.Sign(y);
+        }
+        else
+        { aim = playerMovement.isFacingRight ? Vector2.right : Vector2.left; }
+
+        direction = aim.normalized;
         gunParent.right = direction;
 
-        angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        Vector3 localScale = Vector3.one;
-        localScale.y = (angle > 90 || angle < -90) ? -1f : 1f;
-        gunParent.localScale = localScale;
+
     }
 }
