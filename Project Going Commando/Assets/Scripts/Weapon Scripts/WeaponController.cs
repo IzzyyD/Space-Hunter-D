@@ -18,10 +18,12 @@ public class WeaponController : MonoBehaviour
 
     [Header("Weapon Scroll")]
     public WeaponData[] weapons;
+    public float weaponScrollSpeed;
     private int weaponIndex = 0;
     [HideInInspector] public WeaponData currentWeapon;
     [HideInInspector] public BulletOverlapChecker bulletOverlapChecker;
 
+    #region Bunch Of Parameters
     private GameObject currentGunInstance;
     private float nextFireTime = 0f;
     private Vector2 worldPosition;
@@ -33,7 +35,10 @@ public class WeaponController : MonoBehaviour
     private bool wasShootingLastFrame;
     private bool wasShootHeld;
     private bool lastFacingRight;
-
+    private bool nextHeld;
+    private bool prevHeld;
+    private float nextScrollTime;
+    #endregion
 
     private void Awake()
     { playerMovement = GetComponentInParent<NewPlayerMovement>(); }
@@ -67,20 +72,24 @@ public class WeaponController : MonoBehaviour
 
     void WeaponScroll()
     {
-        float scroll = Mouse.current.scroll.ReadValue().y;
+        if (Time.time < nextScrollTime) return;
 
-        if (scroll > 0f)
+        if (playerInput.nextWeaponPressed && !nextHeld)
         {
-            weaponIndex++;
-            if (weaponIndex >= weapons.Length) weaponIndex = 0;
+            weaponIndex = (weaponIndex + 1) % weapons.Length;
             ApplyWeapon();
+            nextScrollTime = Time.time + weaponScrollSpeed;
         }
-        else if (scroll < 0f)
+
+        if (playerInput.prevWeaponPressed && !prevHeld)
         {
-            weaponIndex--;
-            if (weaponIndex < 0) weaponIndex = weapons.Length - 1;
+            weaponIndex = (weaponIndex - 1 + weapons.Length) % weapons.Length;
             ApplyWeapon();
+            nextScrollTime = Time.time + weaponScrollSpeed;
         }
+
+        nextHeld = playerInput.nextWeaponPressed;
+        prevHeld = playerInput.prevWeaponPressed;
     }
 
     void ApplyWeapon()

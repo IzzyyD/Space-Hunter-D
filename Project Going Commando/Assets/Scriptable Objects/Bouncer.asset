@@ -15,6 +15,9 @@ MonoBehaviour:
   weaponName: Bouncer
   weaponPrefab: {fileID: 7875505718218662041, guid: 4145d9ec334ef374694cdfbe08240a26, type: 3}
   bulletPrefab: {fileID: 8674772391689353418, guid: 9ea79cb30d09ce14cbfa8b7ee3d8201d, type: 3}
-  range: 12
+  range: 15
   cooldown: 1
   isSemiAuto: 1
+  isCharge: 0
+  maxChargeTime: 0
+  chargeSpeed: 0

@@ -63,7 +63,7 @@ public class PlayerData : ScriptableObject
     [Tooltip("Reduces gravity while close to the apex of the jump.")]
     [Range(0f, 1)] public float jumpHangGravityMultiplier;
     
-    [Tooltip("Speeds (close to 0) where the player will experience extra \"jump hang\". The player's velocity.y is closest to 0 at the jump's apex.")]
+    [Tooltip("Speeds (close to 0) where the player will experience extra \"jump hang\". The player's linearVelocityY is closest to 0 at the jump's apex.")]
     public float jumpHangTimeThreshold;    
     [Space(0.5f)]
     public float jumpHangAccelerationMultiplier;

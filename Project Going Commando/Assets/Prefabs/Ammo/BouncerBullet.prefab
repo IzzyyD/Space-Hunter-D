@@ -167,10 +167,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletSpeed: 10
   bulletGravity: 0.7
-  explosion: {fileID: 2747794803204849822, guid: ce6c3d4abb71ccd459004f459cde84bc, type: 3}
-  bombletDelay: 0.15
-  bomblet: {fileID: 8889740948982896483, guid: fbba95ed8faa9bf49b9a7b9e5f766882, type: 3}
-  bombletCount: 3
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  wallsLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  bomblet: {fileID: 8889740948982896483, guid: fbba95ed8faa9bf49b9a7b9e5f766882, type: 3}
+  explosion: {fileID: 2747794803204849822, guid: ce6c3d4abb71ccd459004f459cde84bc, type: 3}
+  bombletCount: 3

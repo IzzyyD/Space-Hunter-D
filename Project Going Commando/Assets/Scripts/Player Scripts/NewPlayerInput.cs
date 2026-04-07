@@ -9,6 +9,8 @@ public class NewPlayerInput : MonoBehaviour
     [HideInInspector] public bool jumpPressed;
     [HideInInspector] public bool dashPressed;
     [HideInInspector] public bool shootPressed;
+    [HideInInspector] public bool nextWeaponPressed;
+    [HideInInspector] public bool prevWeaponPressed;
 
     private void Awake()
     {
@@ -29,6 +31,13 @@ public class NewPlayerInput : MonoBehaviour
         // shoot
         controls.Gameplay.Shoot.performed += ctx => shootPressed = true;
         controls.Gameplay.Shoot.canceled += ctx => shootPressed = false;
+
+        // weapon scroll
+        controls.Gameplay.NextWeapon.performed += ctx => nextWeaponPressed = true;
+        controls.Gameplay.NextWeapon.canceled += ctx => nextWeaponPressed = false;
+
+        controls.Gameplay.PrevWeapon.performed += ctx => prevWeaponPressed = true;
+        controls.Gameplay.PrevWeapon.canceled += ctx => prevWeaponPressed = false;
     }
 
     private void OnEnable() => controls.Gameplay.Enable();

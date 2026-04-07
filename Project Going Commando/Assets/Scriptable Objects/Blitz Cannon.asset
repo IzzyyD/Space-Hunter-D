@@ -15,12 +15,12 @@ MonoBehaviour:
   weaponName: Blitz Cannon
   weaponPrefab: {fileID: 329332697363850581, guid: f4ec7ae72a828304bb5aaf51b3e6294e, type: 3}
   bulletPrefab: {fileID: 0}
-  range: 6
+  range: 9
   cooldown: 0.5
   isSemiAuto: 1
   isCharge: 1
   maxChargeTime: 1
-  chargeSpeed: 0.5
+  chargeSpeed: 0.65
   pelletCount: 15
   spreadAngle: 80
   halfChargeGradient:

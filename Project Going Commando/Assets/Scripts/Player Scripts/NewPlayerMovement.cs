@@ -64,16 +64,33 @@ public class NewPlayerMovement : MonoBehaviour
     [SerializeField] private Transform frontWallCheckPoint;
     [SerializeField] private Transform backWallCheckPoint;
     [SerializeField] private Vector2 wallCheckSize = new Vector2(0.5f, 1f);
+    [SerializeField] private ContactFilter2D groundFilter;
+    [SerializeField] private ContactFilter2D wallFilter;
+    private Collider2D[] overlapResults = new Collider2D[5];
     #endregion
 
+    
     #region Layers & Tags
     [Header("Layers & Tags")]
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask wallsLayer;
     #endregion
+    
 
     private void Awake()
-    { rb = GetComponent<Rigidbody2D>(); }
+    { 
+        rb = GetComponent<Rigidbody2D>();
+        
+        // ground filter
+        groundFilter = new ContactFilter2D();
+        groundFilter.SetLayerMask(groundLayer);
+        groundFilter.useTriggers = false;
+
+        // wall filter
+        wallFilter = new ContactFilter2D();
+        wallFilter.SetLayerMask(wallsLayer);
+        wallFilter.useTriggers = false;
+    }
 
     private void Start()
     {
@@ -112,19 +129,26 @@ public class NewPlayerMovement : MonoBehaviour
         #region Collision Checks
         if (!isJumping && !isDashing)
         {
+            #region Ground Check
             // ground check
-            if (Physics2D.OverlapBox(groundCheckPoint.position, groundCheckSize, 0, groundLayer) && !isJumping) // checks if set box overlaps with ground
-            { lastOnGroundTime = Data.coyoteTime; } // if so, sets the lastGrounded to coyoteTime
+            int groundHits = Physics2D.OverlapBox(groundCheckPoint.position, groundCheckSize, 0f, groundFilter, overlapResults);
+            if (groundHits > 0) 
+                lastOnGroundTime = Data.coyoteTime; 
+            #endregion
 
-            // right wall check
-            if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, wallsLayer) && isFacingRight)
-            || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, wallsLayer) && !isFacingRight)) && !isWallJumping)
+            #region Wall Check
+            // wall checks
+            int frontWallHits = Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0f, wallFilter, overlapResults);
+            int backWallHits = Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0f, wallFilter, overlapResults);
+
+            // Right wall
+            if ((frontWallHits > 0 && isFacingRight) || (backWallHits > 0 && !isFacingRight))
                 lastOnWallRightTime = Data.coyoteTime;
 
-            // left wall check
-            if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, wallsLayer) && !isFacingRight)
-            || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, wallsLayer) && isFacingRight)) && !isWallJumping)
+            // Left wall
+            if ((frontWallHits > 0 && !isFacingRight) || (backWallHits > 0 && isFacingRight))
                 lastOnWallLeftTime = Data.coyoteTime;
+            #endregion
 
             // two checks needed for both left and right walls since whenever the player turns the wall checkPoints swap sides
             lastOnWallTime = Mathf.Max(lastOnWallLeftTime, lastOnWallRightTime);
@@ -518,11 +542,23 @@ public class NewPlayerMovement : MonoBehaviour
     #region Editor Methods
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(groundCheckPoint.position, groundCheckSize);
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireCube(frontWallCheckPoint.position, wallCheckSize);
-        Gizmos.DrawWireCube(backWallCheckPoint.position, wallCheckSize);
+        if (groundCheckPoint != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(groundCheckPoint.position, groundCheckSize);
+        }
+
+        if (frontWallCheckPoint != null)
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireCube(frontWallCheckPoint.position, wallCheckSize);
+        }
+
+        if (backWallCheckPoint != null)
+        {
+            Gizmos.color = Color.cyan; 
+            Gizmos.DrawWireCube(backWallCheckPoint.position, wallCheckSize);
+        }
     }
     #endregion
 }

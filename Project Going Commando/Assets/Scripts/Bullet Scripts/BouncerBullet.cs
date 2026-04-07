@@ -7,6 +7,7 @@ public class BouncerBullet : MonoBehaviour
     [SerializeField] private float bulletSpeed;
     [SerializeField] private float bulletGravity;
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask wallsLayer;
     
 
     [Header("Bomblet Properties")]
@@ -29,7 +30,7 @@ public class BouncerBullet : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (((1 << collision.gameObject.layer) & groundLayer.value) != 0)
+        if (((groundLayer | wallsLayer) & (1 << collision.gameObject.layer)) != 0) 
         {
             
             Instantiate(explosion, transform.position, Quaternion.identity);

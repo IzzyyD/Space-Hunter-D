@@ -25,7 +25,7 @@ public class ChargeShotgun : WeaponData
         if (!owner.bulletOverlapChecker.canFire)
         { return; }
 
-        bool halfCharge = charge <= 0.5f;
+        bool halfCharge = charge < 0.5f;
 
         float usedRange = halfCharge ? range * halfChargeRangeModifier : range;
         float usedZigzag = halfCharge ? 0.01f : zigzagStrength;
@@ -39,20 +39,22 @@ public class ChargeShotgun : WeaponData
             Quaternion rotation = spawnPoint.rotation * Quaternion.Euler(0, 0, offset);
             Vector2 direction = rotation * Vector2.right;
 
-            RaycastHit2D hit = Physics2D.Raycast(spawnPoint.position, direction, usedRange, LayerMask.GetMask("Ground"));
+            RaycastHit2D hit = Physics2D.Raycast(spawnPoint.position, direction, usedRange, LayerMask.GetMask("Ground", "Walls"));
             Vector2 endPoint = hit ? hit.point : (Vector2)spawnPoint.position + direction * usedRange;
             DrawLine(spawnPoint.position, endPoint, usedZigzag, usedGradient);
         }
     }
 
-   
+
     private void DrawLine(Vector2 start, Vector2 end, float zigzag, Gradient gradient)
     {
         GameObject lineObj = new GameObject("ShotgunPellet");
         LineRenderer lr = lineObj.AddComponent<LineRenderer>();
 
+        int count = Mathf.Max(2, zigzagPoints);
+
         lr.useWorldSpace = true;
-        lr.positionCount = zigzagPoints;
+        lr.positionCount = count;
         lr.widthMultiplier = lineWidth;
         lr.colorGradient = gradient;
         lr.material = new Material(Shader.Find("Sprites/Default"));
@@ -60,9 +62,9 @@ public class ChargeShotgun : WeaponData
         Vector2 direction = (end - start).normalized;
         Vector2 perp = new Vector2(-direction.y, direction.x);
 
-        for (int i = 0; i < zigzagPoints; i++)
+        for (int i = 0; i < count; i++)
         {
-            float t = i / (float)(zigzagPoints - 1);
+            float t = i / (float)(count - 1);
             Vector2 basePos = Vector2.Lerp(start, end, t);
 
             float noise = Random.Range(-zigzag, zigzag);

@@ -170,4 +170,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  wallsLayer:
+    serializedVersion: 2
+    m_Bits: 256
   maxRicochets: 3
