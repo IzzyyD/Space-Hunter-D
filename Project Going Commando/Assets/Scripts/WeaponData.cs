@@ -22,10 +22,11 @@ public abstract class WeaponData : ScriptableObject
     public float chargeSpeed;
 
     public virtual void HandleFire(Transform spawnPoint, WeaponController owner, float charge)
-    { HandleFire(spawnPoint, owner);}
-    
+    { HandleFire(spawnPoint, owner); }
+
 
 
     public abstract void HandleFire(Transform spawnPoint, WeaponController owner);
+   
 
 }

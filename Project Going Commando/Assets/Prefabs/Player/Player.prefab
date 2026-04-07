@@ -206,8 +206,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5127521712236777467}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5068, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.75, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -486,6 +486,7 @@ GameObject:
   - component: {fileID: 5135565455987652309}
   - component: {fileID: 4094815276586941228}
   - component: {fileID: 8393895582758636195}
+  - component: {fileID: 926582880572049651}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -597,6 +598,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Data: {fileID: 11400000, guid: 145668068d96f3b41b0147cb016b4844, type: 2}
+  playerInput: {fileID: 926582880572049651}
   groundCheckPoint: {fileID: 7554733263081793627}
   groundCheckSize: {x: 0.49, y: 0.03}
   frontWallCheckPoint: {fileID: 5008711646182459936}
@@ -605,6 +607,22 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+--- !u!114 &926582880572049651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7854557325167180015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9b0851f221f7f043a6448e890376718, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveInput: {x: 0, y: 0}
+  jumpPressed: 0
+  dashPressed: 0
+  shootPressed: 0
 --- !u!1 &8881693847876985230
 GameObject:
   m_ObjectHideFlags: 0
@@ -765,6 +783,7 @@ MonoBehaviour:
   gunParent: {fileID: 5244113576799952488}
   bulletSpawnPoint: {fileID: 7750197736972195667}
   weaponNameText: {fileID: 0}
+  playerInput: {fileID: 926582880572049651}
   chargeText: {fileID: 0}
   weapons:
   - {fileID: 11400000, guid: e4c17c1bbcb5cd94b93435b1d2459302, type: 2}

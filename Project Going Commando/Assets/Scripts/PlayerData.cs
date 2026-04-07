@@ -15,17 +15,9 @@ public class PlayerData : ScriptableObject
     public float fallGravityMultiplier;
 
     [Tooltip("Maximum fall speed of the player when falling.")]
-    public float maxFallSpeed;
+    public float maxFallSpeed;    
 
-    
-    [Space(5)]
-    [Tooltip("Larger multiplier to the player's gravityScale when they're falling and a downwards input is pressed.")]
-    public float fastFallGravityMultiplier;
-
-    [Tooltip("Maximum fall speed of the player when performing a fast fall.")]
-    public float maxFastFallSpeed;
-
-    [Space(20)]
+    [Space(10)]
     [Header("Run")]
     [Tooltip("Target speed we want the player to reach.")]
     public float runMaxSpeed;

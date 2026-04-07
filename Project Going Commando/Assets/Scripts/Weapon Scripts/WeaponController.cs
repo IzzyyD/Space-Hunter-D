@@ -8,6 +8,8 @@ public class WeaponController : MonoBehaviour
     [SerializeField] private Transform gunParent;
     [SerializeField] private Transform bulletSpawnPoint;
     [SerializeField] private TextMeshProUGUI weaponNameText;
+    [SerializeField] private NewPlayerInput playerInput;
+    
 
     [Header("Charge UI")]
     [SerializeField] private TextMeshProUGUI chargeText;
@@ -28,6 +30,10 @@ public class WeaponController : MonoBehaviour
     private float chargeTime = 0f;
     private bool isCharging;
     private NewPlayerMovement playerMovement;
+    private bool wasShootingLastFrame;
+    private bool wasShootHeld;
+    private bool lastFacingRight;
+
 
     private void Awake()
     { playerMovement = GetComponentInParent<NewPlayerMovement>(); }
@@ -36,6 +42,8 @@ public class WeaponController : MonoBehaviour
     {
         if (weapons.Length > 0)
             ApplyWeapon();
+
+        lastFacingRight = playerMovement.isFacingRight;
     }
 
     void Update()
@@ -101,14 +109,16 @@ public class WeaponController : MonoBehaviour
         if (currentWeapon == null || Time.time < nextFireTime) return;
 
         bool shouldFire = currentWeapon.isSemiAuto
-            ? Mouse.current.leftButton.wasPressedThisFrame
-            : Mouse.current.leftButton.isPressed;
+            ? playerInput.shootPressed && !wasShootingLastFrame
+            : playerInput.shootPressed;
 
         if (shouldFire && bulletOverlapChecker != null && bulletOverlapChecker.canFire)
         {
             currentWeapon.HandleFire(bulletSpawnPoint, this);
             nextFireTime = Time.time + currentWeapon.cooldown;
         }
+
+        wasShootingLastFrame = playerInput.shootPressed;
     }
 
 
@@ -116,14 +126,14 @@ public class WeaponController : MonoBehaviour
     {
         if (Time.time < nextFireTime) return;
 
-        if (Mouse.current.leftButton.isPressed)
+        if (playerInput.shootPressed)
         {
             isCharging = true;
             chargeTime += Time.deltaTime * currentWeapon.chargeSpeed;
             chargeTime = Mathf.Clamp(chargeTime, 0f, currentWeapon.maxChargeTime);
         }
 
-        if (isCharging && Mouse.current.leftButton.wasReleasedThisFrame)
+        if (isCharging && !playerInput.shootPressed && wasShootHeld)
         {
             if (bulletOverlapChecker != null && bulletOverlapChecker.canFire)
             {
@@ -135,6 +145,8 @@ public class WeaponController : MonoBehaviour
             chargeTime = 0f;
             isCharging = false;
         }
+
+        wasShootHeld = playerInput.shootPressed;
     }
 
     void UpdateChargeUI()
@@ -159,27 +171,32 @@ public class WeaponController : MonoBehaviour
         if (chargeText != null)
             chargeText.text = "";
     }
-
     
     void Aiming()
     {
-        if ( gunParent == null || playerMovement == null) return;
+        Vector2 raw = playerInput.moveInput;
+        
+        float x = Mathf.Abs(raw.x) > 0.5f ? Mathf.Sign(raw.x) : 0f;
+        float y = Mathf.Abs(raw.y) > 0.5f ? Mathf.Sign(raw.y) : 0f;
 
-        float x = Input.GetAxisRaw("Horizontal");
-        float y = Input.GetAxisRaw("Vertical");
+        Vector2 aim;
 
-        Vector2 aim = Vector2.zero;
-
-        if (x != 0 || y != 0)
-        {
-            aim.x = Mathf.Sign(x);
-            aim.y = Mathf.Sign(y);
-        }
+        if(x != 0 || y != 0)
+            aim = new Vector2(x, y);
         else
-        { aim = playerMovement.isFacingRight ? Vector2.right : Vector2.left; }
+            aim = playerMovement.isFacingRight ? Vector2.right : Vector2.left;
 
         direction = aim.normalized;
         gunParent.right = direction;
+
+        if(playerMovement.isFacingRight != lastFacingRight)
+        {
+            Vector3 localPos = bulletSpawnPoint.localPosition;
+            localPos.x = Mathf.Abs(localPos.x) * (playerMovement.isFacingRight ? 1 : -1);
+            bulletSpawnPoint.localPosition = localPos;
+
+            lastFacingRight = playerMovement.isFacingRight;
+        }
 
 
     }

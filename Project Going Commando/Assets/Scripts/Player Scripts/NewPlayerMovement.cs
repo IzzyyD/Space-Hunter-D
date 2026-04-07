@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using Unity.VisualScripting;
+using TMPro;
 
 
 public class NewPlayerMovement : MonoBehaviour
@@ -22,6 +23,8 @@ public class NewPlayerMovement : MonoBehaviour
     public bool isWallJumping { get; private set; }
     public bool isDashing { get; private set; }
     public bool isSliding { get; private set; }
+
+    [SerializeField] private NewPlayerInput playerInput;
 
     // timers
     public float lastOnGroundTime { get; private set; }
@@ -66,6 +69,7 @@ public class NewPlayerMovement : MonoBehaviour
     #region Layers & Tags
     [Header("Layers & Tags")]
     [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask wallsLayer;
     #endregion
 
     private void Awake()
@@ -90,19 +94,18 @@ public class NewPlayerMovement : MonoBehaviour
         #endregion
 
         #region Input Handler
-        moveInput.x = Input.GetAxisRaw("Horizontal");
-        moveInput.y = Input.GetAxisRaw("Vertical");
+        moveInput = playerInput.moveInput;
 
         if (moveInput.x != 0)
             CheckDirectionToFace(moveInput.x > 0);
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (playerInput.jumpPressed)
             { OnJumpInput(); }
 
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (!playerInput.jumpPressed)
             { OnJumpUpInput(); }
 
-        if (Input.GetKeyDown(KeyCode.X))
+        if (playerInput.dashPressed)
             { OnDashInput(); }
         #endregion
 
@@ -110,17 +113,17 @@ public class NewPlayerMovement : MonoBehaviour
         if (!isJumping && !isDashing)
         {
             // ground check
-            if (Physics2D.OverlapBox(groundCheckPoint.position, wallCheckSize, 0, groundLayer) && !isJumping) // checks if set box overlaps with ground
+            if (Physics2D.OverlapBox(groundCheckPoint.position, groundCheckSize, 0, groundLayer) && !isJumping) // checks if set box overlaps with ground
             { lastOnGroundTime = Data.coyoteTime; } // if so, sets the lastGrounded to coyoteTime
 
             // right wall check
-            if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, groundLayer) && isFacingRight)
-            || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, groundLayer) && !isFacingRight)) && !isWallJumping)
+            if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, wallsLayer) && isFacingRight)
+            || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, wallsLayer) && !isFacingRight)) && !isWallJumping)
                 lastOnWallRightTime = Data.coyoteTime;
 
             // left wall check
-            if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, groundLayer) && !isFacingRight)
-            || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, groundLayer) && isFacingRight)) && !isWallJumping)
+            if (((Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0, wallsLayer) && !isFacingRight)
+            || (Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0, wallsLayer) && isFacingRight)) && !isWallJumping)
                 lastOnWallLeftTime = Data.coyoteTime;
 
             // two checks needed for both left and right walls since whenever the player turns the wall checkPoints swap sides
@@ -148,7 +151,7 @@ public class NewPlayerMovement : MonoBehaviour
                 isJumpFalling = false;            
         }
 
-       if (!isDashing) 
+        if (!isDashing)
         {
             // jump
             if (CanJump() && lastPressedJumpTime > 0)
@@ -166,7 +169,7 @@ public class NewPlayerMovement : MonoBehaviour
                 isJumping = false;
                 isJumpCut = false;
                 isJumpFalling = false;
-                
+
                 wallJumpStartTime = Time.time;
                 lastWallJumpDir = (lastOnWallRightTime > 0) ? -1 : 1;
 
@@ -175,8 +178,8 @@ public class NewPlayerMovement : MonoBehaviour
         }
         #endregion
 
-       #region Dash Checks
-       if (CanDash() && lastPressedDashTime > 0)
+        #region Dash Checks
+        if (CanDash() && lastPressedDashTime > 0)
         {
             // freeze game for a split second. adds juice and a bit of forgiveness over directional input
             Sleep(Data.dashSleepTime);
@@ -208,15 +211,7 @@ public class NewPlayerMovement : MonoBehaviour
         {
             // higher gravity if we've released the jump input or are falling
             if (isSliding)
-            { SetGravityScale(0); }
-
-            else if (rb.linearVelocityY < 0 && moveInput.y < 0)
-            {
-                // much higher gravity if holding down
-                SetGravityScale(Data.gravityScale * Data.fastFallGravityMultiplier);
-                // caps maximum fall speed, so when falling over large distances we don't accelerate to insanely high speeds
-                rb.linearVelocity = new Vector2(rb.linearVelocityX, Mathf.Max(rb.linearVelocityY, -Data.maxFastFallSpeed));
-            }
+            { SetGravityScale(0); }         
 
             else if (isJumpCut)
             {
@@ -379,12 +374,10 @@ public class NewPlayerMovement : MonoBehaviour
         lastOnGroundTime = 0;
 
         #region Perform Jump
-        // we increase the force applied if we are falling
-        float force = Data.jumpForce;
-        if (rb.linearVelocityY < 0)
-            force -= rb.linearVelocityY;
+        // sets the player's Y velocity to zero
+        rb.linearVelocity = new Vector2(rb.linearVelocityY, 0f);
 
-        rb.AddForce(Vector2.up * force, ForceMode2D.Impulse);
+        rb.AddForce(Vector2.up * Data.jumpForce, ForceMode2D.Impulse);
         #endregion
     }
 

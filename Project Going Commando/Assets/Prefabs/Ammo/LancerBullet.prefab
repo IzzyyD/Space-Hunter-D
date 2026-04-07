@@ -165,7 +165,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc3f7fcd362b78440bebeb2cf77a63ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpeed: 10
+  bulletSpeed: 14
   destroyTime: 5
   groundLayer:
     serializedVersion: 2
