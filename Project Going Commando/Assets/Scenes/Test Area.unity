@@ -1991,6 +1991,10 @@ PrefabInstance:
       propertyPath: weaponNameText
       value: 
       objectReference: {fileID: 1137881769}
+    - target: {fileID: 4847694143147656297, guid: 9f586f31cae17b54da21ed9965ab920a, type: 3}
+      propertyPath: weaponScrollSpeed
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 7854557325167180015, guid: 9f586f31cae17b54da21ed9965ab920a, type: 3}
       propertyPath: m_Name
       value: Player
