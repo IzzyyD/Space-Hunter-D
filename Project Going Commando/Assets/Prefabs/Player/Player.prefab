@@ -825,7 +825,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e4c17c1bbcb5cd94b93435b1d2459302, type: 2}
   - {fileID: 11400000, guid: 64e692dd7dc9ca2448d36dfaeda0e160, type: 2}
   - {fileID: 11400000, guid: 7550b56ceb8b37d4f89e89c20c6a34ed, type: 2}
-  weaponScrollSpeed: 2.5
+  weaponScrollSpeed: 0.1
   currentWeapon: {fileID: 11400000, guid: e4c17c1bbcb5cd94b93435b1d2459302, type: 2}
   bulletOverlapChecker: {fileID: 5161042987977886703}
 --- !u!4 &5244113576799952488 stripped

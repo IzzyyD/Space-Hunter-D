@@ -35,6 +35,10 @@ public class NewPlayerMovement : MonoBehaviour
     // jump
     private bool isJumpCut;
     private bool isJumpFalling;
+    private enum JumpType { None, Ground, Wall }
+    private bool jumpConsumedThisFrame;
+    private float groundJumpLock;
+    private bool jumpWasPressedLastFrame;
 
     // wall jump
     private float wallJumpStartTime;
@@ -66,7 +70,10 @@ public class NewPlayerMovement : MonoBehaviour
     [SerializeField] private Vector2 wallCheckSize = new Vector2(0.5f, 1f);
     [SerializeField] private ContactFilter2D groundFilter;
     [SerializeField] private ContactFilter2D wallFilter;
+    
     private Collider2D[] overlapResults = new Collider2D[5];
+    
+
     #endregion
 
     
@@ -108,6 +115,7 @@ public class NewPlayerMovement : MonoBehaviour
 
         lastPressedJumpTime -= Time.deltaTime;
         lastPressedDashTime -= Time.deltaTime;
+        groundJumpLock -= Time.deltaTime;
         #endregion
 
         #region Input Handler
@@ -116,52 +124,73 @@ public class NewPlayerMovement : MonoBehaviour
         if (moveInput.x != 0)
             CheckDirectionToFace(moveInput.x > 0);
 
-        if (playerInput.jumpPressed)
+        if (playerInput.jumpPressed && !jumpWasPressedLastFrame)
             { OnJumpInput(); }
 
-        if (!playerInput.jumpPressed)
+        if (!playerInput.jumpPressed && jumpWasPressedLastFrame)
             { OnJumpUpInput(); }
 
         if (playerInput.dashPressed)
             { OnDashInput(); }
+
+        // store previous frame state
+        jumpWasPressedLastFrame = playerInput.jumpPressed;
         #endregion
 
         #region Collision Checks
         if (!isJumping && !isDashing)
         {
-            #region Ground Check
-            // ground check
-            int groundHits = Physics2D.OverlapBox(groundCheckPoint.position, groundCheckSize, 0f, groundFilter, overlapResults);
-            if (groundHits > 0) 
-                lastOnGroundTime = Data.coyoteTime; 
-            #endregion
 
-            #region Wall Check
+            // ground check
+            int groundHits = Physics2D.OverlapBox(groundCheckPoint.position, groundCheckSize, 0f, groundFilter, overlapResults);            
+            bool rawGround = groundHits > 0;
+                        
             // wall checks
             int frontWallHits = Physics2D.OverlapBox(frontWallCheckPoint.position, wallCheckSize, 0f, wallFilter, overlapResults);
             int backWallHits = Physics2D.OverlapBox(backWallCheckPoint.position, wallCheckSize, 0f, wallFilter, overlapResults);
+            bool rawWall = (frontWallHits > 0 || backWallHits > 0);
 
-            // Right wall
-            if ((frontWallHits > 0 && isFacingRight) || (backWallHits > 0 && !isFacingRight))
-                lastOnWallRightTime = Data.coyoteTime;
+            // ground takes priority
+            if (rawGround)
+            {
+                lastOnGroundTime = Data.coyoteTime;
+                lastOnWallTime = 0;
+            }
+            else
+            { lastOnGroundTime -= Time.deltaTime; }
 
-            // Left wall
-            if ((frontWallHits > 0 && !isFacingRight) || (backWallHits > 0 && isFacingRight))
-                lastOnWallLeftTime = Data.coyoteTime;
-            #endregion
+            // only allow wall detection if the player is not grounded
+            if (!rawGround && rawWall)
+            {
+                if ((frontWallHits > 0 && isFacingRight) || (backWallHits > 0 && !isFacingRight))
+                    lastOnWallRightTime = Data.coyoteTime;
 
-            // two checks needed for both left and right walls since whenever the player turns the wall checkPoints swap sides
-            lastOnWallTime = Mathf.Max(lastOnWallLeftTime, lastOnWallRightTime);
+                if ((frontWallHits > 0 && !isFacingRight) || (backWallHits > 0 && isFacingRight))
+                    lastOnWallLeftTime = Data.coyoteTime;
+
+                lastOnWallTime = Mathf.Max(lastOnWallLeftTime, lastOnWallRightTime);
+            }
+            else
+            { lastOnWallTime -= Time.deltaTime; }
+
+            
         }
         #endregion
 
         #region Jump Checks
+        
+        // reset per-frame jump lock
+        jumpConsumedThisFrame = false;
+
+        // update cooldown
+        groundJumpLock -= Time.deltaTime;
+
         if (isJumping && rb.linearVelocityY < 0)
         {
             isJumping = false;
 
-            if(!isWallJumping)
-                isJumpFalling = true;
+            if (!isWallJumping) 
+            { isJumpFalling = true; }
         }
 
         if (isWallJumping && Time.time - wallJumpStartTime > Data.wallJumpTime)
@@ -169,35 +198,48 @@ public class NewPlayerMovement : MonoBehaviour
 
         if (lastOnGroundTime > 0 && !isJumping && !isWallJumping)
         {
+            isJumpFalling = false;
             isJumpCut = false;
-
-            if (!isJumping)
-                isJumpFalling = false;            
+            
         }
 
-        if (!isDashing)
+        // only processes jump once per frame
+        if (!isDashing && lastPressedJumpTime > 0 && !jumpConsumedThisFrame)
         {
-            // jump
-            if (CanJump() && lastPressedJumpTime > 0)
-            {
-                isJumping = true;
-                isWallJumping = false;
-                isJumpCut = false;
-                isJumpFalling = false;
-                Jump();
-            }
-            // wall jump
-            else if (CanWallJump() && lastPressedJumpTime > 0)
-            {
-                isWallJumping = true;
-                isJumping = false;
-                isJumpCut = false;
-                isJumpFalling = false;
+            JumpType type = GetJumpType();
 
-                wallJumpStartTime = Time.time;
-                lastWallJumpDir = (lastOnWallRightTime > 0) ? -1 : 1;
+            switch (type)
+            {
+                case JumpType.Wall:
+                    isWallJumping = true;
+                    isJumping = false;
+                    isJumpCut = false;
+                    isJumpFalling = false;
 
-                WallJump(lastWallJumpDir);
+                    wallJumpStartTime = Time.time;
+                    lastWallJumpDir = (lastOnWallRightTime > 0) ? -1 : 1;
+
+                    WallJump(lastWallJumpDir);
+
+                    lastPressedJumpTime = 0;
+                    jumpConsumedThisFrame = true;
+                    break;
+
+
+                case JumpType.Ground:
+                    isJumping = true;
+                    isWallJumping = false;
+                    isJumpCut = false;
+                    isJumpFalling= false;
+
+                    Jump();
+
+                    lastPressedJumpTime= 0;
+                    jumpConsumedThisFrame= true;
+                    break;
+
+
+                   
             }
         }
         #endregion
@@ -396,13 +438,13 @@ public class NewPlayerMovement : MonoBehaviour
         // ensures we can't call Jump multiple times from one press
         lastPressedJumpTime = 0;
         lastOnGroundTime = 0;
+        
+        // prevents wall jump overlap in corners
+        groundJumpLock = 0.1f;   
 
-        #region Perform Jump
-        // sets the player's Y velocity to zero
-        rb.linearVelocity = new Vector2(rb.linearVelocityY, 0f);
-
-        rb.AddForce(Vector2.up * Data.jumpForce, ForceMode2D.Impulse);
-        #endregion
+        
+        rb.linearVelocity = new Vector2(rb.linearVelocityX, 0f);
+        rb.AddForce(Vector2.up * Data.jumpForce, ForceMode2D.Impulse);        
     }
 
     private void WallJump(int dir)
@@ -512,8 +554,13 @@ public class NewPlayerMovement : MonoBehaviour
 
     private bool CanWallJump()
     {
-        return lastPressedJumpTime > 0 && lastOnWallTime > 0 && lastOnGroundTime <= 0 && (!isWallJumping || 
-            (lastOnWallRightTime > 0 && lastWallJumpDir == 1) || (lastOnWallLeftTime > 0 && lastWallJumpDir == -1));
+        return lastPressedJumpTime > 0
+            && lastOnWallTime > 0
+            && lastOnGroundTime <= 0
+            && groundJumpLock <= 0f
+            && (!isWallJumping ||
+                (lastOnWallRightTime > 0 && lastWallJumpDir == 1) ||
+                (lastOnWallLeftTime > 0 && lastWallJumpDir == -1));
     }
 
     private bool CanJumpCut()
@@ -537,6 +584,18 @@ public class NewPlayerMovement : MonoBehaviour
         else
             return false;
     }
+
+    private JumpType GetJumpType()
+    {
+        if (CanWallJump())
+        { return JumpType.Wall; }
+
+        if (CanJump())
+        { return JumpType.Ground; }
+
+        return JumpType.None;
+    }
+
     #endregion
 
     #region Editor Methods
