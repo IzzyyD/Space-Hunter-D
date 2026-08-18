@@ -1,4 +1,4 @@
-# Project-Going-Commando
+# Space Hunter D
 A 2D shoot em' up platformer inspired by games like Mega Man 2 and Ratchet &amp; Clank: Going Commando.
 
 You play as Vaash, a bounty hunter tasked with tracking down and eliminating Blackbeard and his 8 Space Pirate Lords who have taken over various planets, plundering and killing all those who stand in their way.
