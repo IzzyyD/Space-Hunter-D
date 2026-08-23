@@ -16,9 +16,19 @@ public class CamTransition : MonoBehaviour
     [SerializeField] private float distance = 10f;
     [SerializeField] private float scrollSpeed = 20f;
 
+    [Header("Starting Camera Section")]
+
+    [SerializeField] private bool cameraStartsOnLeft = true;
+
+    private bool cameraIsOnLeft;
+
     [Header("Camera Controller")]
-    [SerializeField] private CamController cameraController;    
-    
+    [SerializeField] private CamController cameraController;
+
+    private void Start()
+    { cameraIsOnLeft = cameraStartsOnLeft; }
+   
+
     private Vector2 GetDirection()
     {
         switch (direction)
@@ -44,37 +54,36 @@ public class CamTransition : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!collision.CompareTag("Player"))
-            return;  
-
-        Vector2 transitionDirection = GetDirection();
+            return;          
 
         // determines which side of the transition the player came from
         Vector2 playerToTransition = collision.transform.position - transform.position;
 
-        // reverses direction if the player is approaching from the opposite side
+        bool playerIsOnLeft;
+
+        // horizontal transition
         if (direction == TransitionDirection.Left || direction == TransitionDirection.Right)
-        {
-            if (playerToTransition.x > 0)
-                transitionDirection = Vector2.left;
-            else
-                transitionDirection = Vector2.right;
-        }
+        { playerIsOnLeft = playerToTransition.x < 0; }
         else
-        {
-            if (playerToTransition.y > 0)
-                transitionDirection = Vector2.down;
-            else
-                transitionDirection = Vector2.up;
-        }
+        { playerIsOnLeft = playerToTransition.y < 0; }
+
+
+        // if the player entered from the side camera is already on then it won't scroll again
+        if (playerIsOnLeft == cameraIsOnLeft)
+            return;
+
+        Vector2 transitionDirection;
+
+        if (direction == TransitionDirection.Left || direction == TransitionDirection.Right)
+        { transitionDirection = playerIsOnLeft ? Vector2.left : Vector2.right;}
+        else
+        { transitionDirection = playerIsOnLeft ? Vector2.down : Vector2.up; }
 
         cameraController.StartTransition(transitionDirection, distance, scrollSpeed);
 
-        Debug.Log("Something entered the transition: " + collision.name);
-
-        if (!collision.CompareTag("Player"))
-            return;
-
-        Debug.Log("PLAYER ENTERED TRANSITION!");
+        // camera has now moved to the player's side
+        cameraIsOnLeft = playerIsOnLeft;
+        
     }
 
 }
