@@ -25,7 +25,7 @@ public class CamController : MonoBehaviour
                 
     }
 
-    private System.Collections.IEnumerator MoveCamera(Vector2 direction, float distance, float scrollSpeed)
+    private IEnumerator MoveCamera(Vector2 direction, float distance, float scrollSpeed)
     {
         isTransitioning = true;
 
@@ -46,9 +46,14 @@ public class CamController : MonoBehaviour
 
         cinemachineCamera.position = targetPosition;
 
+        // stores the camera's new section offset
+        posComposer.TargetOffset += new Vector3(direction.x * distance, direction.y * distance, 0f);
+
+        // resume following the player
         posComposer.enabled = true;
 
         isTransitioning = false;
+
     }
 
     

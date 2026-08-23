@@ -17,7 +17,7 @@ public class CamTransition : MonoBehaviour
     [SerializeField] private float scrollSpeed = 20f;
 
     [Header("Camera Controller")]
-    [SerializeField] private CamController cameraController;
+    [SerializeField] private CamController cameraController;    
     
     private Vector2 GetDirection()
     {
@@ -43,20 +43,38 @@ public class CamTransition : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!collision.CompareTag("Player"))
+            return;  
+
+        Vector2 transitionDirection = GetDirection();
+
+        // determines which side of the transition the player came from
+        Vector2 playerToTransition = collision.transform.position - transform.position;
+
+        // reverses direction if the player is approaching from the opposite side
+        if (direction == TransitionDirection.Left || direction == TransitionDirection.Right)
+        {
+            if (playerToTransition.x > 0)
+                transitionDirection = Vector2.left;
+            else
+                transitionDirection = Vector2.right;
+        }
+        else
+        {
+            if (playerToTransition.y > 0)
+                transitionDirection = Vector2.down;
+            else
+                transitionDirection = Vector2.up;
+        }
+
+        cameraController.StartTransition(transitionDirection, distance, scrollSpeed);
+
         Debug.Log("Something entered the transition: " + collision.name);
 
         if (!collision.CompareTag("Player"))
             return;
 
         Debug.Log("PLAYER ENTERED TRANSITION!");
-
-        Vector2 transitionDirection = GetDirection();
-
-        cameraController.StartTransition(
-            transitionDirection,
-            distance,
-            scrollSpeed
-        );
     }
 
 }
