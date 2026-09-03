@@ -30,16 +30,16 @@ public class CamController : MonoBehaviour
         confiner.InvalidateBoundingShapeCache();
     }
 
-    public void StartTransition(CamRoom targetRoom, float scrollSpeed)
+    public void StartTransition(CamRoom targetRoom, CamTransition.TransitionAxis axis, float scrollSpeed)
     {
         if (isTransitioning || targetRoom == null)
             return;
 
-        StartCoroutine(MoveCamera(targetRoom, scrollSpeed));
+        StartCoroutine(MoveCamera(targetRoom, axis, scrollSpeed));
                 
     }
 
-    private IEnumerator MoveCamera(CamRoom targetRoom, float scrollSpeed)
+    private IEnumerator MoveCamera(CamRoom targetRoom, CamTransition.TransitionAxis axis, float scrollSpeed)
     {
         isTransitioning = true;
 
@@ -50,15 +50,20 @@ public class CamController : MonoBehaviour
         Vector3 startPosition = cinemachineCamera.position;
 
         // move towards the center of the new room
-        Vector3 targetPosition = targetRoom.transform.position;
+        Vector3 targetPosition = startPosition;
 
-        // keep the camera's Z position
-        targetPosition.z = startPosition.z;
 
-        while (Vector3.Distance(cinemachineCamera.position, targetPosition) > 0.01f)
+       if (axis == CamTransition.TransitionAxis.Horizontal)
+        { targetPosition.x = targetRoom.RoomBounds.bounds.center.x; }
+       else
+        { targetPosition.y = targetRoom.RoomBounds.bounds.center.y; }
+
+       while (Vector3.Distance(cinemachineCamera.position, targetPosition) > 0.01f)
         {
             cinemachineCamera.position = Vector3.MoveTowards(cinemachineCamera.position, targetPosition, scrollSpeed * Time.deltaTime);
+
             yield return null;
+        
         }
 
         cinemachineCamera.position = targetPosition;
