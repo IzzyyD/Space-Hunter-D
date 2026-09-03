@@ -4,50 +4,72 @@ using System.Collections;
 
 public class CamController : MonoBehaviour
 {
-    [SerializeField] private Transform player;
+    [Header("References")]   
     [SerializeField] private Transform cinemachineCamera;
+    [SerializeField] private CinemachineConfiner2D confiner;
+    [SerializeField] private CamRoom currentRoom;   
 
     private CinemachinePositionComposer posComposer;
-
     private bool isTransitioning;
 
     public bool IsTransitioning => isTransitioning;
+    public CamRoom CurrentRoom => currentRoom;
 
     private void Awake()
     { posComposer = cinemachineCamera.GetComponent<CinemachinePositionComposer>(); }
 
-    public void StartTransition(Vector2 direction, float distance, float scrollSpeed)
+    public void SetRoom(CamRoom newRoom)
     {
-        if (isTransitioning)
+        if (newRoom == null)
             return;
 
-        StartCoroutine(MoveCamera(direction, distance, scrollSpeed));
+        currentRoom = newRoom;
+
+        // tells cinemachine to stop using room A's bounds and use the next room bounds
+        confiner.BoundingShape2D = newRoom.RoomBounds;
+        confiner.InvalidateBoundingShapeCache();
+    }
+
+    public void StartTransition(CamRoom targetRoom, CamTransition.TransitionAxis axis, float scrollSpeed)
+    {
+        if (isTransitioning || targetRoom == null)
+            return;
+
+        StartCoroutine(MoveCamera(targetRoom, axis, scrollSpeed));
                 
     }
 
-    private IEnumerator MoveCamera(Vector2 direction, float distance, float scrollSpeed)
+    private IEnumerator MoveCamera(CamRoom targetRoom, CamTransition.TransitionAxis axis, float scrollSpeed)
     {
         isTransitioning = true;
 
         // temporarily stop cinemachine following the player
         posComposer.enabled = false;
 
+        // current camera position
         Vector3 startPosition = cinemachineCamera.position;
 
-        Vector3 targetPosition = startPosition + new Vector3(direction.x, direction.y, 0f) * distance;
+        // move towards the center of the new room
+        Vector3 targetPosition = startPosition;
 
-        float transitionDistance = distance;
 
-        while (Vector3.Distance(cinemachineCamera.position, targetPosition) > 0.01f)
+       if (axis == CamTransition.TransitionAxis.Horizontal)
+        { targetPosition.x = targetRoom.RoomBounds.bounds.center.x; }
+       else
+        { targetPosition.y = targetRoom.RoomBounds.bounds.center.y; }
+
+       while (Vector3.Distance(cinemachineCamera.position, targetPosition) > 0.01f)
         {
             cinemachineCamera.position = Vector3.MoveTowards(cinemachineCamera.position, targetPosition, scrollSpeed * Time.deltaTime);
+
             yield return null;
+        
         }
 
         cinemachineCamera.position = targetPosition;
 
-        // stores the camera's new section offset
-        posComposer.TargetOffset += new Vector3(direction.x * distance, direction.y * distance, 0f);
+        // switch to the new room bounds
+        SetRoom(targetRoom);
 
         // resume following the player
         posComposer.enabled = true;
