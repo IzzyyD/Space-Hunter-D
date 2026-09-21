@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 077a3f6e75da071448f6e8bd57677448, type: 3}
   m_Name: Player Data
   m_EditorClassIdentifier: 
-  gravityStrength: -77.77777
-  gravityScale: 7.9284167
+  gravityStrength: -99.99999
+  gravityScale: 10.193679
   fallGravityMultiplier: 1.5
   maxFallSpeed: 25
   runMaxSpeed: 11
@@ -24,9 +24,9 @@ MonoBehaviour:
   accelInAir: 0.65
   deccelInAir: 0.65
   doConserveMomentum: 1
-  jumpHeight: 3.5
+  jumpHeight: 4.5
   jumpTimeToApex: 0.3
-  jumpForce: 23.333332
+  jumpForce: 29.999998
   jumpCutGravityMultiplier: 2
   jumpHangGravityMultiplier: 0.5
   jumpHangTimeThreshold: 1
@@ -36,12 +36,12 @@ MonoBehaviour:
   wallJumpRunLerp: 0.5
   wallJumpTime: 0.15
   doTurnOnWallJump: 1
-  slideSpeed: -12
+  slideSpeed: -8
   slideAccel: 12
   coyoteTime: 0.1
   jumpInputBufferTime: 0.01
   dashAmount: 1
-  dashSpeed: 20
+  dashSpeed: 25
   dashSleepTime: 0.05
   dashAttackTime: 0.15
   dashEndTime: 0.15

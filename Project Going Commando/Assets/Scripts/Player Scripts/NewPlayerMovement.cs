@@ -49,6 +49,8 @@ public class NewPlayerMovement : MonoBehaviour
     private bool dashRefilling;
     private Vector2 lastDashDir;
     private bool isDashAttacking;
+    private bool dashStartedOnGround;
+    private bool dashWasPressedLastFrame;
 
     #endregion
 
@@ -130,11 +132,12 @@ public class NewPlayerMovement : MonoBehaviour
         if (!playerInput.jumpPressed && jumpWasPressedLastFrame)
             { OnJumpUpInput(); }
 
-        if (playerInput.dashPressed)
+        if (playerInput.dashPressed && !dashWasPressedLastFrame)
             { OnDashInput(); }
 
         // store previous frame state
         jumpWasPressedLastFrame = playerInput.jumpPressed;
+        dashWasPressedLastFrame = playerInput.dashPressed;
         #endregion
 
         #region Collision Checks
@@ -203,6 +206,32 @@ public class NewPlayerMovement : MonoBehaviour
             
         }
 
+        // dash jump
+        if (isDashing && dashStartedOnGround && lastPressedJumpTime > 0 && !jumpConsumedThisFrame)
+        {
+            float dashMomentum = rb.linearVelocityX;
+            StopCoroutine(nameof(StartDash));
+            isDashing = false;
+            isDashAttacking = false;
+            dashStartedOnGround = false;
+
+            SetGravityScale(Data.gravityScale);
+
+            isJumping = true;
+            isWallJumping = false;
+            isJumpCut = false;
+            isJumpFalling = false;
+
+            Jump();
+
+            rb.linearVelocity = new Vector2(dashMomentum, rb.linearVelocityY);
+
+            lastPressedJumpTime = 0;
+            jumpConsumedThisFrame = true;
+        }
+
+
+
         // only processes jump once per frame
         if (!isDashing && lastPressedJumpTime > 0 && !jumpConsumedThisFrame)
         {
@@ -248,13 +277,31 @@ public class NewPlayerMovement : MonoBehaviour
         if (CanDash() && lastPressedDashTime > 0)
         {
             // freeze game for a split second. adds juice and a bit of forgiveness over directional input
-            Sleep(Data.dashSleepTime);
+            Sleep(Data.dashSleepTime);          
 
-            // if no direction pressed, dash forward
-            if (moveInput != Vector2.zero)
-                lastDashDir = moveInput;
+            // remember whether this dash began while grounded
+            dashStartedOnGround = lastOnGroundTime > 0;
+
+            if (dashStartedOnGround)
+            {
+                // ground dashes can only go left or right
+                if (moveInput.x > 0)
+                { lastDashDir = Vector2.right; }
+                else if (moveInput.x < 0)
+                { lastDashDir = Vector2.left; }
+                else
+                { lastDashDir = isFacingRight ? Vector2.right : Vector2.left; }
+
+            }
             else
-                lastDashDir = isFacingRight ? Vector2.right : Vector2.left;
+            {
+                // air dashes retain full directional control
+                if (moveInput != Vector2.zero)
+                { lastDashDir = moveInput; }
+                else
+                { lastDashDir = isFacingRight ? Vector2.right: Vector2.left; }
+            }
+            
 
             isDashing = true;
             isJumping = false;
@@ -437,7 +484,7 @@ public class NewPlayerMovement : MonoBehaviour
     {
         // ensures we can't call Jump multiple times from one press
         lastPressedJumpTime = 0;
-        lastOnGroundTime = 0;
+        lastOnGroundTime = -1f;
         
         // prevents wall jump overlap in corners
         groundJumpLock = 0.1f;   
