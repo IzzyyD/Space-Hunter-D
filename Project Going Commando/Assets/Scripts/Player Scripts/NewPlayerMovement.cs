@@ -51,6 +51,8 @@ public class NewPlayerMovement : MonoBehaviour
     private bool isDashAttacking;
     private bool dashStartedOnGround;
     private bool dashWasPressedLastFrame;
+    private float dashJumpBufferTime;
+    private float dashJumpMomentum;
 
     #endregion
 
@@ -118,6 +120,7 @@ public class NewPlayerMovement : MonoBehaviour
         lastPressedJumpTime -= Time.deltaTime;
         lastPressedDashTime -= Time.deltaTime;
         groundJumpLock -= Time.deltaTime;
+        dashJumpBufferTime -= Time.deltaTime;
         #endregion
 
         #region Input Handler
@@ -207,13 +210,14 @@ public class NewPlayerMovement : MonoBehaviour
         }
 
         // dash jump
-        if (isDashing && dashStartedOnGround && lastPressedJumpTime > 0 && !jumpConsumedThisFrame)
+        if ((isDashing && dashStartedOnGround || dashJumpBufferTime > 0) && lastPressedJumpTime > 0 && !jumpConsumedThisFrame)
         {
-            float dashMomentum = rb.linearVelocityX;
+            float dashMomentum = dashJumpMomentum;
             StopCoroutine(nameof(StartDash));
             isDashing = false;
             isDashAttacking = false;
             dashStartedOnGround = false;
+            dashJumpBufferTime = 0;
 
             SetGravityScale(Data.gravityScale);
 
@@ -290,7 +294,7 @@ public class NewPlayerMovement : MonoBehaviour
                 else if (moveInput.x < 0)
                 { lastDashDir = Vector2.left; }
                 else
-                { lastDashDir = isFacingRight ? Vector2.right : Vector2.left; }
+                { lastDashDir = isFacingRight ? Vector2.right : Vector2.left; }            
 
             }
             else
@@ -301,6 +305,9 @@ public class NewPlayerMovement : MonoBehaviour
                 else
                 { lastDashDir = isFacingRight ? Vector2.right: Vector2.left; }
             }
+
+            if (dashStartedOnGround)
+            { dashJumpMomentum = lastDashDir.normalized.x * Data.dashSpeed; }           
             
 
             isDashing = true;
@@ -558,6 +565,13 @@ public class NewPlayerMovement : MonoBehaviour
 
         while (Time.time - startTime <= Data.dashEndTime)
         { yield return null; }
+
+
+        // give the player a short window to dash jump
+        if (dashStartedOnGround)
+        { dashJumpBufferTime = Data.dashJumpBufferDuration; }
+
+        dashStartedOnGround = false;
 
         // dash over
         isDashing = false;        

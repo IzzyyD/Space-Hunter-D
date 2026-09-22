@@ -109,6 +109,9 @@ public class PlayerData : ScriptableObject
     public float dashSleepTime;
     [Space(5)]
     public float dashAttackTime;
+
+    [Tooltip("Dash jump grace period timer")]
+    public float dashJumpBufferDuration;
     [Space(5)]
 
     [Tooltip("Time after you finish the inital drag phase, smoothing the transition back to idle (or any standard state).")]
@@ -117,7 +120,7 @@ public class PlayerData : ScriptableObject
     [Tooltip("Slows down player, makes dash feel more responsive (used in Celeste).")]
     public Vector2 dashEndSpeed;
 
-    [Tooltip("Slows the affect of player movement while dashing.")]
+    [Tooltip("Slows the effect of player movement while dashing.")]
     [Range(0f, 1f)] public float dashEndRunLerp;
     
     [Space(5)]    
