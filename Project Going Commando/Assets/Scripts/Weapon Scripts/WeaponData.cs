@@ -16,15 +16,16 @@ public abstract class WeaponData : ScriptableObject
     [Header("Special Properties")]
     public bool isSemiAuto;
     public bool isCharge;
+    public bool isChargeHybrid;
+    public bool noAim;
 
     [Header("Charge Properties")]
     public float maxChargeTime;
     public float chargeSpeed;
+    public float chargeThreshold;
 
     public virtual void HandleFire(Transform spawnPoint, WeaponController owner, float charge)
     { HandleFire(spawnPoint, owner); }
-
-
 
     public abstract void HandleFire(Transform spawnPoint, WeaponController owner);
    

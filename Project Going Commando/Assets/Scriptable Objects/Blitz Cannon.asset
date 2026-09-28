@@ -12,15 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afb2820805147c64f829c7815ed1c015, type: 3}
   m_Name: Blitz Cannon
   m_EditorClassIdentifier: 
-  weaponName: Blitz Cannon
+  weaponName: Blunderbuss
   weaponPrefab: {fileID: 329332697363850581, guid: f4ec7ae72a828304bb5aaf51b3e6294e, type: 3}
   bulletPrefab: {fileID: 0}
   range: 9
   cooldown: 0.5
   isSemiAuto: 1
   isCharge: 1
+  isChargeHybrid: 0
+  noAim: 0
   maxChargeTime: 1
   chargeSpeed: 0.65
+  chargeThreshold: 0
   pelletCount: 15
   spreadAngle: 80
   halfChargeGradient:

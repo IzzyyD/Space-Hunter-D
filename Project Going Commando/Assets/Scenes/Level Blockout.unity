@@ -584,7 +584,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.0000036, y: -1.04072, z: -10}
+  m_LocalPosition: {x: -1.000003, y: -1.04072, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -724,7 +724,7 @@ Transform:
   m_GameObject: {fileID: 521283752}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.0000002, y: -4.5100007, z: -10}
+  m_LocalPosition: {x: -1.0000002, y: -4.51, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1026,7 +1026,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -298, y: -364}
+  m_AnchoredPosition: {x: -136.91, y: -352.05432}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &756076077
@@ -1287,7 +1287,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1127218065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2330,6 +2330,26 @@ PrefabInstance:
       propertyPath: weaponNameText
       value: 
       objectReference: {fileID: 1137881769}
+    - target: {fileID: 4847694143147656297, guid: 9f586f31cae17b54da21ed9965ab920a, type: 3}
+      propertyPath: weapons.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4847694143147656297, guid: 9f586f31cae17b54da21ed9965ab920a, type: 3}
+      propertyPath: 'weapons.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: a8e5e5814759cb147a95c869d6c88b91, type: 2}
+    - target: {fileID: 4847694143147656297, guid: 9f586f31cae17b54da21ed9965ab920a, type: 3}
+      propertyPath: 'weapons.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: e4c17c1bbcb5cd94b93435b1d2459302, type: 2}
+    - target: {fileID: 4847694143147656297, guid: 9f586f31cae17b54da21ed9965ab920a, type: 3}
+      propertyPath: 'weapons.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 64e692dd7dc9ca2448d36dfaeda0e160, type: 2}
+    - target: {fileID: 4847694143147656297, guid: 9f586f31cae17b54da21ed9965ab920a, type: 3}
+      propertyPath: 'weapons.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 7550b56ceb8b37d4f89e89c20c6a34ed, type: 2}
     - target: {fileID: 7854557325167180015, guid: 9f586f31cae17b54da21ed9965ab920a, type: 3}
       propertyPath: m_Name
       value: Player

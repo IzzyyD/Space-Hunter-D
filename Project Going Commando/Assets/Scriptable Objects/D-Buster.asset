@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23f3ab0584e9d44489b29586bbbd5400, type: 3}
+  m_Name: D-Buster
+  m_EditorClassIdentifier: 
+  weaponName: D-Buster
+  weaponPrefab: {fileID: 7920316425629495828, guid: d745bee4a06fb59429eb522f4213c760, type: 3}
+  bulletPrefab: {fileID: 3516392398874931023, guid: 61db5733a2e04d042ad2152f0e010c7c, type: 3}
+  range: 15
+  cooldown: 0.15
+  isSemiAuto: 1
+  isCharge: 1
+  isChargeHybrid: 1
+  noAim: 1
+  maxChargeTime: 1
+  chargeSpeed: 1
+  chargeThreshold: 0.2
+  chargedBulletPrefab: {fileID: 7018527570594909242, guid: 3c0d02e21419d5a4e8caf0219c1909c1, type: 3}

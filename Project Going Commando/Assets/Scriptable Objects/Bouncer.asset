@@ -12,12 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 999d519f28c653d42bc9a9456eedb278, type: 3}
   m_Name: Bouncer
   m_EditorClassIdentifier: 
-  weaponName: Bouncer
+  weaponName: Krackenspawn
   weaponPrefab: {fileID: 7875505718218662041, guid: 4145d9ec334ef374694cdfbe08240a26, type: 3}
   bulletPrefab: {fileID: 8674772391689353418, guid: 9ea79cb30d09ce14cbfa8b7ee3d8201d, type: 3}
   range: 15
   cooldown: 1
   isSemiAuto: 1
   isCharge: 0
+  isChargeHybrid: 0
+  noAim: 0
   maxChargeTime: 0
   chargeSpeed: 0
+  chargeThreshold: 0

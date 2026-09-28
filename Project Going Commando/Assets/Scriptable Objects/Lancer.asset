@@ -12,12 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3005799426357742a1f5b54e4f68997, type: 3}
   m_Name: Lancer
   m_EditorClassIdentifier: 
-  weaponName: Lancer
+  weaponName: Frivolous Spender
   weaponPrefab: {fileID: 1770555473763712812, guid: 978f91db9bd86564a85e619b4085c246, type: 3}
   bulletPrefab: {fileID: 8950876148833154496, guid: e57a34da6dcfca54c950c6360aeedaee, type: 3}
   range: 15
   cooldown: 0.15
   isSemiAuto: 0
   isCharge: 0
-  maxChargeTime: 0
-  chargeSpeed: 0
+  isChargeHybrid: 0
+  noAim: 0
+  maxChargeTime: 1
+  chargeSpeed: 0.5
+  chargeThreshold: 0
