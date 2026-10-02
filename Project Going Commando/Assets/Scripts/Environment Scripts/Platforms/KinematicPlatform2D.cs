@@ -3,16 +3,24 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D),typeof(Collider2D))]
 public abstract class KinematicPlatform2D : MonoBehaviour
 {
-    public float cycleRunTime; // time it takes to complete 1 cycle of movement
-    public float cycleWaitTime; // how long to wait before starting another cycle
-    protected float currentCycleTime; // for subclasses to check what the current cycle time is
-    protected float currentWaitTime; // for subclasses to check what the current wait time is 
+    [Tooltip("Time it takes to complete 1 cycle of movement")]
+    public float cycleRunTime;
+    
+    [Tooltip("How long to wait before starting another cycle")]
+    public float cycleWaitTime;
+    
+    [Tooltip("For subclasses to check what the current cycle time is")]
+    protected float currentCycleTime; 
+    
+    [Tooltip("For subclasses to check what the current wait time is ")]
+    protected float currentWaitTime;
 
-    // after a cycle completes, does the time start from 0 again or does it go in the opposite direction?
+    [Tooltip("After a cycle completes, does the time start from 0 again or does it go in the opposite direction?")]
     public enum CycleType
     { repeat, pingPong }
 
     public CycleType cycleType;
+
     protected sbyte cycleDirection = 1; // only for ping pong mode
     protected Rigidbody2D rb;
 
@@ -66,9 +74,7 @@ public abstract class KinematicPlatform2D : MonoBehaviour
                     // we also subtract the wait time by the time we already exceeded
                     currentWaitTime = cycleWaitTime - (currentCycleTime - cycleRunTime);
                     currentCycleTime = 0; // the next cycle time to start from
-                }
-
-                
+                }               
          
             
                 break;
@@ -97,16 +103,7 @@ public abstract class KinematicPlatform2D : MonoBehaviour
                 break;
               
         }
-    }
-
-    // parents any rigidbody when they step on the platform, so it moves along with the platform
-    protected virtual void OnCollisionEnter2D(Collision2D collision)
-    { collision.rigidbody.transform.SetParent(transform); }
-
-    // unparents any rigidbody when they leave the platform, so it stops moving along with the platform
-    protected virtual void OnCollisionExit2D(Collision2D collision)
-    { collision.rigidbody.transform.SetParent(null); }
-
+    }  
 
 
 

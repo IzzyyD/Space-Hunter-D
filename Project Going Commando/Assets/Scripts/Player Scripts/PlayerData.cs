@@ -72,8 +72,7 @@ public class PlayerData : ScriptableObject
     
     
     [Header("Wall Jump")]
-    [Tooltip("The actual force applied to the player when wall jumping.")]
-    
+    [Tooltip("The actual force applied to the player when wall jumping.")]    
     public Vector2 wallJumpForce; 
     [Space(5)]
     [Tooltip("Reduces the effect of player's movement while wall jumping.")]

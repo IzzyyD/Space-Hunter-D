@@ -16,8 +16,11 @@ public class StraightMovingPlatform2D : KinematicPlatform2D
         // needed since it manages the cycle time
         base.Update();
 
-        // since the cycle time is there we can use Lerp
-        transform.position = Vector2.Lerp(origin, origin + endPoint, currentCycleTime / cycleRunTime);
+        // calculate where the platform should be
+        Vector2 targetPosition = Vector2.Lerp(origin, origin + endPoint, currentCycleTime / cycleRunTime);
+
+        // move the rigidbody instead of transform
+        rb.MovePosition(targetPosition);
     }
 
     protected override void Reset()
