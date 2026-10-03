@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEditor;
+
 
 public class StraightMovingPlatform2D : KinematicPlatform2D
 {
@@ -36,7 +36,7 @@ public class StraightMovingPlatform2D : KinematicPlatform2D
 
     private void OnDrawGizmosSelected()
     {
-        Vector2 start = EditorApplication.isPlaying ? origin : (Vector2)transform.position, 
+        Vector2 start = Application.isPlaying ? origin : (Vector2)transform.position, 
             end = start + endPoint;
         Gizmos.color = Color.cyan;
         Gizmos.DrawLine(start, end);
