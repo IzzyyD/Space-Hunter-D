@@ -105,7 +105,7 @@ MonoBehaviour:
   appearTime: 2
   disappearTime: 2
   warningTime: 0.5
-  warningColorHex: '#EE1515'
+  warningColorHex: '#02EFEE'
   flashInterval: 0.1
 --- !u!61 &3648095636443205385
 BoxCollider2D:

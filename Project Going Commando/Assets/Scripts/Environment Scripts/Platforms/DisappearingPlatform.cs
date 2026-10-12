@@ -9,12 +9,18 @@ public class DisappearingPlatform : MonoBehaviour
     [SerializeField] private float disappearTime;
     [SerializeField] private float warningTime;
 
-    [Header("Warning")]
+
+    [Header("Appearance Flash")]
+    [SerializeField] private float appearFlashTime;
+    [SerializeField] private float appearFlashInterval;
+
+    [Header("Disappearance Warning")]
     [SerializeField] private string warningColorHex;
     [SerializeField] private float flashInterval;
 
     private SpriteRenderer spriteRenderer;
     private Collider2D platformCollider;
+    
     private Color originalColor;
     private Color warningColor;
 
@@ -33,7 +39,13 @@ public class DisappearingPlatform : MonoBehaviour
     }
 
     private void Start()
-    { StartCoroutine(PlatformCycle()); }
+    {
+        // start invisible and non-solid
+        spriteRenderer.enabled = false;
+        platformCollider.enabled = false;
+
+        StartCoroutine(PlatformCycle()); 
+    }
 
     private System.Collections.IEnumerator PlatformCycle()
     {
@@ -42,18 +54,34 @@ public class DisappearingPlatform : MonoBehaviour
 
         while (true)
         {
-            // platform is visible and solid
+
+            // flashes without changing color before it appears
+            spriteRenderer.color = originalColor;
+            platformCollider.enabled = false;
+
+            float appearanceTimer = 0f;
+
+            while (appearanceTimer < appearFlashTime)
+            {
+                spriteRenderer.enabled = !spriteRenderer.enabled;
+
+                yield return new WaitForSeconds(appearFlashInterval);
+
+                appearanceTimer += appearFlashInterval;
+            }
+
+            // platform is now visible and solid
             spriteRenderer.enabled = true;
             platformCollider.enabled = true;
             spriteRenderer.color = originalColor;
 
-            // normal visible period - warningTime should always be shorter than appearTime to avoid errors
-            yield return new WaitForSeconds(appearTime - warningTime);
+            // stay visible until the warning begins
+            yield return new WaitForSeconds(Mathf.Max(0f, appearTime - warningTime));
 
             // warning flash
-            float timer = 0f;
+            float warningTimer = 0f;
 
-            while (timer < warningTime)
+            while (warningTimer < warningTime)
             {
                 spriteRenderer.color = warningColor;
                 yield return new WaitForSeconds(flashInterval);
@@ -61,7 +89,7 @@ public class DisappearingPlatform : MonoBehaviour
                 spriteRenderer.color = originalColor;
                 yield return new WaitForSeconds(flashInterval);
 
-                timer += flashInterval * 2f;
+                warningTimer += flashInterval * 2f;
             }
 
             // make sure it's hidden
