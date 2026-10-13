@@ -24,6 +24,8 @@ public abstract class KinematicPlatform2D : MonoBehaviour
     protected sbyte cycleDirection = 1; // only for ping pong mode
     protected Rigidbody2D rb;
 
+    protected bool movementBlocked;
+
     // awake is used here so we don't have to override start in child classes
     protected virtual void Awake()
     { rb = GetComponent<Rigidbody2D>(); }
@@ -37,6 +39,8 @@ public abstract class KinematicPlatform2D : MonoBehaviour
     // protected because it needs to be overriden
     protected virtual void Update()
     {
+        if (movementBlocked) return;
+
         if (currentWaitTime <= 0)
         {
             currentCycleTime += Time.deltaTime * cycleDirection;
@@ -48,6 +52,9 @@ public abstract class KinematicPlatform2D : MonoBehaviour
             HandleCycleRestart();
         }
     }
+
+    public void SetMovementBlocked(bool blocked)
+    { movementBlocked = blocked; }
 
     void HandleCycleRestart()
     {
