@@ -25,7 +25,7 @@ public class ChargeShotgun : WeaponData
         if (!owner.bulletOverlapChecker.canFire)
         { return; }
 
-        bool halfCharge = charge < 0.5f;
+        bool halfCharge = charge < 1f;
 
         float usedRange = halfCharge ? range * halfChargeRangeModifier : range;
         float usedZigzag = halfCharge ? 0.01f : zigzagStrength;

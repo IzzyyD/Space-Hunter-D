@@ -22,6 +22,6 @@ MonoBehaviour:
   isChargeHybrid: 1
   noAim: 1
   maxChargeTime: 1
-  chargeSpeed: 1
-  chargeThreshold: 0.5
+  chargeSpeed: 0.9
+  chargeThreshold: 1
   chargedBulletPrefab: {fileID: 7018527570594909242, guid: 3c0d02e21419d5a4e8caf0219c1909c1, type: 3}

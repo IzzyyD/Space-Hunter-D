@@ -22,8 +22,8 @@ MonoBehaviour:
   isChargeHybrid: 0
   noAim: 0
   maxChargeTime: 1
-  chargeSpeed: 0.65
-  chargeThreshold: 0
+  chargeSpeed: 0.75
+  chargeThreshold: 1
   pelletCount: 15
   spreadAngle: 80
   halfChargeGradient:

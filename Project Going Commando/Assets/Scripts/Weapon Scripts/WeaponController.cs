@@ -198,18 +198,29 @@ public class WeaponController : MonoBehaviour
 
     void UpdateChargeUI()
     {
-        if (chargeText == null || !currentWeapon.isCharge) return;
+        if (chargeText == null || currentWeapon == null) return;
+
+        bool showCharge = currentWeapon.isCharge && isCharging;
+
+        if (currentWeapon.isChargeHybrid)
+        { showCharge = showCharge && chargeTime >= 0.2f * currentWeapon.chargeSpeed; }
+
+        chargeText.gameObject.SetActive(showCharge);
 
         float charge01 = Mathf.Clamp01(chargeTime / currentWeapon.maxChargeTime);
         chargeText.text = $"CHARGING: {Mathf.RoundToInt(charge01 * 100)}%";
 
-        if (charge01 < 0.5f)
-        { chargeText.color = Color.yellow; }
+        if (charge01 < 1f)
+        { 
+            chargeText.color = Color.yellow;
+            chargeText.enabled = true;
+        }
 
         else
         { 
             chargeText.color = Color.red;
             chargeText.text = "FULL CHARGE!";
+            chargeText.enabled = Mathf.PingPong(Time.time * 2f, 1f) > 0.5f;
         }
     }
 

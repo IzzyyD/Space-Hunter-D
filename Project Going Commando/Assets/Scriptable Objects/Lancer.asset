@@ -21,6 +21,6 @@ MonoBehaviour:
   isCharge: 0
   isChargeHybrid: 0
   noAim: 0
-  maxChargeTime: 1
-  chargeSpeed: 0.5
+  maxChargeTime: 0
+  chargeSpeed: 0
   chargeThreshold: 0
